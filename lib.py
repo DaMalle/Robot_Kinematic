@@ -25,7 +25,7 @@ class Tragectory_planner:
         pass
 
     def get_weights(self, segment: Conditions) -> Weights:
-        """Weights for a cubic polynomial"""
+        """Returns weights for a cubic polynomial"""
         return Weights(
             a0=segment.theta0,
             a1=segment.theta0_diff,
@@ -37,18 +37,21 @@ class Tragectory_planner:
         )
 
     def print_theta(self, segment: Conditions) -> None:
+        """Prints theta-angle for specific time or symbolic time"""
         a = self.get_weights(segment)
         if segment.time == None: time = sp.Symbol('t') 
         else: time = segment.time
         sp.pprint(sp.N(a.a0 + a.a1 * time + a.a2 * time**2 + a.a3 * time**3, 3))
 
     def print_derivative_theta(self, segment: Conditions) -> None:
+        """Prints derivative of theta-angle for specific time or symbolic time"""
         a = self.get_weights(segment)
         if segment.time == None: time = sp.Symbol('t') 
         else: time = segment.time
         sp.pprint(sp.N(a.a1 + 2 * a.a2 * time + 3 * a.a3 * time**2, 3))
 
     def print_double_derivative_theta(self, segment: Conditions) -> None:
+        """Prints double derivative of theta-angle for specific time or symbolic time"""
         a = self.get_weights(segment)
         if segment.time == None: time = sp.Symbol('t') 
         else: time = segment.time
