@@ -1,30 +1,61 @@
+from dataclasses import dataclass
 import sympy as sp
+
+
+@dataclass
+class Weights:
+    a0: float
+    a1: float
+    a2: float
+    a3: float
+
+
+@dataclass
+class Conditions:
+    t: float
+    theta0: float
+    thetaf: float
+    theta0_diff: float = 0
+    thetaf_diff: float = 0
+    time: float | None = None
+
 
 class Tragectory_planner:
     def __init__(self) -> None:
         pass
 
-    def get_weights(self, theta0: float, thetaf: float, time, theta0_diff: float = 0, thetaf_diff: float = 0) -> list[float]:
+    def get_weights(self, segment: Conditions) -> Weights:
         """Weights for a cubic polynomial"""
-        a0: float = theta0
-        a1: float = theta0_diff
-        a2: float = (3 * (thetaf - theta0) / time**2) - (2 * theta0_diff / time) - thetaf_diff / time
-        a3: float = (-2 * (thetaf - theta0) / time**3) + (thetaf_diff + theta0_diff) / time**2
+        return Weights(
+            a0=segment.theta0,
+            a1=segment.theta0_diff,
+            a2=(3 * (segment.thetaf - segment.theta0) / segment.t**2) \
+                - (2 * segment.theta0_diff / segment.t) \
+                - segment.thetaf_diff / segment.t,
+            a3=(-2 * (segment.thetaf - segment.theta0) / segment.t**3) \
+                + (segment.thetaf_diff + segment.theta0_diff) / segment.t**2
+        )
 
-        return [a0, a1, a2, a3]
+    def print_theta(self, segment: Conditions) -> None:
+        a = self.get_weights(segment)
+        if segment.time == None: time = sp.Symbol('t') 
+        else: time = segment.time
+        sp.pprint(sp.N(a.a0 + a.a1 * time + a.a2 * time**2 + a.a3 * time**3, 3))
 
-    def print_theta(self, theta0: float, thetaf: float, time, theta0_diff: float = 0, thetaf_diff: float = 0) -> None:
-        weight = self.get_weights(theta0, thetaf, time, theta0_diff, thetaf_diff)
-        time = sp.Symbol('t')
-        sp.pprint(sp.N(weight[0] + weight[1] * time + weight[2] * time**2 + weight[3] * time**3, 3))
+    def print_derivative_theta(self, segment: Conditions) -> None:
+        a = self.get_weights(segment)
+        if segment.time == None: time = sp.Symbol('t') 
+        else: time = segment.time
+        sp.pprint(sp.N(a.a1 + 2 * a.a2 * time + 3 * a.a3 * time**2, 3))
 
-    def print_derivative_theta(self, theta0: float, thetaf: float, time, theta0_diff: float = 0, thetaf_diff: float = 0) -> None:
-        weight = self.get_weights(theta0, thetaf, time, theta0_diff, thetaf_diff)
-        time = sp.Symbol('t')
-        sp.pprint(sp.N(weight[1] + 2 * weight[2] * time + 3 * weight[3] * time**2, 3))
-
+    def print_double_derivative_theta(self, segment: Conditions) -> None:
+        a = self.get_weights(segment)
+        if segment.time == None: time = sp.Symbol('t') 
+        else: time = segment.time
+        sp.pprint(sp.N(2 * a.a2 + 6 * a.a3 * time, 3))
 
 if __name__ == "__main__":
     t = Tragectory_planner()
-    t.print_theta(15, 75, 3, 0, 10)
-    t.print_derivative_theta(15, 75, 3, 0, 0)
+    tf = sp.Symbol('tf')
+    t.print_theta(Conditions(5, 15, 1, 0, 15.5, 0.876))
+    t.print_theta(Conditions(15.5, 40, 1, 15.5, 0))
