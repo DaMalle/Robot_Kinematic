@@ -87,6 +87,15 @@ def to_radians(number: float) -> float:
     """Converts degrees to radians"""
     return number*math.pi/180
 
+def to_euler_angles(transformation_matrix: np.ndarray) -> np.ndarray:
+    return
+
+def to_quaternions(transformation_matrix: np.ndarray) -> np.ndarray:
+    return
+
+# parabolic blend
+# jacobians
+
 if __name__ == "__main__":
     Xs = 289.48
     Ys = 334.78
