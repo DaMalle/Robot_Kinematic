@@ -14,6 +14,7 @@ class Weights:
 
 @dataclass
 class Conditions:
+    """Conditions uses radians for yaw, pitch and roll"""
     t: float
     theta0: float
     thetaf: float
@@ -39,7 +40,7 @@ class TragectoryPlanner:
         )
 
     def print_weights(self, segment: Conditions) -> None:
-        """Returns weights for a cubic polynomial"""
+        """Prints weights for a cubic polynomial"""
         a0 = sp.N(segment.theta0, 3)
         a1 = sp.N(segment.theta0_diff, 3)
         a2 = sp.N((3 * (segment.thetaf - segment.theta0) / segment.t**2)
@@ -76,8 +77,15 @@ class TragectoryPlanner:
 
 def is_rotation_matrix(matrix: np.ndarray) -> bool:
     """Returns true if numpy array is (close enough) to an identity matrix"""
-    return np.allclose(matrix, np.identity(len(matrix)))
+    return np.allclose(matrix.T @ matrix, np.identity(3)) and np.allclose(np.linalg.det(matrix), 1)
 
+def to_degrees(number: float) -> float:
+    """Converts radians to degrees"""
+    return number*180/math.pi
+
+def to_radians(number: float) -> float:
+    """Converts degrees to radians"""
+    return number*math.pi/180
 
 if __name__ == "__main__":
     Xs = 289.48
@@ -94,7 +102,7 @@ if __name__ == "__main__":
     Pe = -55.20
     Yawe = 139.95
 
-    tf = (((Xe-Xs)**2 + (Ye - Ys)**2 + (Ze - Zs)**2)**0.5)/100
+    """tf = (((Xe-Xs)**2 + (Ye - Ys)**2 + (Ze - Zs)**2)**0.5)/100
     t = TragectoryPlanner()
     # tf = sp.Symbol('tf')
     t.print_weights(Conditions(tf, Xs, Xe))
@@ -102,4 +110,10 @@ if __name__ == "__main__":
     t.print_weights(Conditions(tf, Zs, Ze))
     t.print_weights(Conditions(tf, Rs*math.pi/180, Re*math.pi/180))
     t.print_weights(Conditions(tf, Ps*math.pi/180, Pe*math.pi/180))
-    t.print_weights(Conditions(tf, Yaws*math.pi/180, Yawe*math.pi/180))
+    t.print_weights(Conditions(tf, Yaws*math.pi/180, Yawe*math.pi/180))"""
+
+    print(is_rotation_matrix(np.array([
+        [0, 0, 1],
+        [1, 0, 0],
+        [0, 1, 0]
+    ])))
