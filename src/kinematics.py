@@ -15,15 +15,19 @@ class Weights:
 @dataclass
 class Conditions:
     """Conditions uses radians for yaw, pitch and roll"""
-    t: float
-    theta0: float
-    thetaf: float
-    theta0_diff: float = 0
-    thetaf_diff: float = 0
-    time: float | None = None
+    t: float                  # endtime or tf
+    theta0: float             # start angle for joint
+    thetaf: float             # end angle for joint
+    theta0_diff: float = 0    # 
+    thetaf_diff: float = 0    # 
+    time: float | None = None # used to define for specifik time
 
 
-class TragectoryPlanner:
+class Trajectory_cubic_polynomials:
+    """Trajectory generation with cubic poly nomials WITHOUT any viapoints
+    Used to make ptp/point-to-point/jmove/jointmove.
+    not linear
+    """
     def __init__(self) -> None:
         pass
 
@@ -74,8 +78,44 @@ class TragectoryPlanner:
         time = segment.time if segment.time else sp.Symbol('t')
         sp.pprint(sp.N(2 * a.a2 + 6 * a.a3 * time, 3))
 
-def rotX():
-    pass
+class Trajectory_parabolic_blends:
+    def __init__(self) -> None:
+        pass
+
+    def print_theta(self) -> None:
+        pass
+
+def T_mdh(alpha: float, a: float, d: float, theta: float) -> np.ndarray:
+    """Returns transformation matrix for modified denavit-hartenberg"""
+    s = math.sin
+    c = math.cos
+    return np.array([
+        [c(theta), -s(theta), 0, a],
+        [s(theta) * c(alpha), c(theta) * c(alpha), -s(alpha), -s(alpha) * d],
+        [s(theta) * s(alpha), c(theta) * s(alpha), c(alpha), c(alpha) * d],
+        [0, 0, 0, 1]
+    ])
+
+def rotX(angle: float) -> np.ndarray:
+    return np.array([
+        [1, 0, 0],
+        [0, math.cos(angle), -math.sin(angle)],
+        [0, math.sin(angle), math.cos(angle)]
+    ])
+
+def rotY(angle: float) -> np.ndarray:
+    return np.array([
+        [math.cos(angle), 0, math.sin(angle)],
+        [0, 1, 0],
+        [-math.sin(angle), 0, math.cos(angle)]
+    ])
+
+def rotZ(angle: float) -> np.ndarray:
+    return np.array([
+        [math.cos(angle), -math.sin(angle), 0],
+        [math.sin(angle), math.cos(angle), 0],
+        [0, 0, 1]
+    ])
 
 def is_rotation_matrix(matrix: np.ndarray) -> bool:
     """Returns true if numpy array is (close enough) to an identity matrix"""
@@ -95,10 +135,12 @@ def to_euler_angles(transformation_matrix: np.ndarray) -> np.ndarray:
 def to_quaternions(transformation_matrix: np.ndarray) -> np.ndarray:
     return
 
-# parabolic blend
+
 # jacobians
 
 if __name__ == "__main__":
+    np.set_printoptions(precision=3, suppress=True)
+    """
     Xs = 289.48
     Ys = 334.78
     Zs = 818.21
@@ -113,7 +155,7 @@ if __name__ == "__main__":
     Pe = -55.20
     Yawe = 139.95
 
-    """tf = (((Xe-Xs)**2 + (Ye - Ys)**2 + (Ze - Zs)**2)**0.5)/100
+    tf = (((Xe-Xs)**2 + (Ye - Ys)**2 + (Ze - Zs)**2)**0.5)/100
     t = TragectoryPlanner()
     # tf = sp.Symbol('tf')
     t.print_weights(Conditions(tf, Xs, Xe))
