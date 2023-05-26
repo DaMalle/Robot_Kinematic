@@ -74,6 +74,8 @@ class TragectoryPlanner:
         time = segment.time if segment.time else sp.Symbol('t')
         sp.pprint(sp.N(2 * a.a2 + 6 * a.a3 * time, 3))
 
+def rotX():
+    pass
 
 def is_rotation_matrix(matrix: np.ndarray) -> bool:
     """Returns true if numpy array is (close enough) to an identity matrix"""
