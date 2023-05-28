@@ -4,6 +4,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation as R
+from numpy.linalg import inv
 
 
 @dataclass
@@ -174,7 +175,7 @@ def to_radians(number: float) -> float:
     """Converts degrees to radians"""
     return number * math.pi/180
 
-def to_euler_angles(rotation_matrix: np.ndarray, Conventions: str, degrees: bool) -> np.ndarray:
+def to_euler_angles(rotation_matrix: np.ndarray, Conventions: str, degrees: bool = True) -> np.ndarray:
     """
     euler angles are intrinsic whereas fixed-angles are extrinsic
     example of converntions: zyx, xyx, zyz etc (all combinations of x y z = 12)
@@ -182,7 +183,7 @@ def to_euler_angles(rotation_matrix: np.ndarray, Conventions: str, degrees: bool
     r = R.from_matrix(rotation_matrix)
     return r.as_euler(Conventions.upper(), degrees=degrees)
 
-def to_fixed_angless(rotation_matrix: np.ndarray, Conventions: str, degrees: bool) -> np.ndarray:
+def to_fixed_angless(rotation_matrix: np.ndarray, Conventions: str, degrees: bool = True) -> np.ndarray:
     """fixed-angles are extrinsic. fixed: xyz = euler zyx"""
     r = R.from_matrix(rotation_matrix)
     return r.as_euler(Conventions.lower(), degrees=degrees)
@@ -252,7 +253,7 @@ if __name__ == "__main__":
 
 
     ############################################################################
-    Trajectory_cubic_polynomials().print_theta(Conditions(1, 25, 15, 0, -30))
+    Trajectory_cubic_polynomials().graph_theta(Conditions(1, 25, 15, 0, -30))
 
     print(Trajectory_parabolic_blends(-50, 140, 8, 20).get_theta(0.5))
     Trajectory_parabolic_blends(-50, 140, 8, 20).graph_theta()
